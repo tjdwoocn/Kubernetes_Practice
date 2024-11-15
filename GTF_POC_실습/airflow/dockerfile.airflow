@@ -1,0 +1,31 @@
+# Apache Airflow의 기본 이미지 사용
+FROM apache/airflow:2.9.3
+
+# 시스템 종속성 설치
+USER root
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends librdkafka-dev build-essential && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 필요한 패키지를 설치할 requirements.txt 파일 복사
+COPY requirements_airflow.txt /opt/airflow/requirements_airflow.txt
+
+USER airflow
+
+# Python 패키지 설치
+RUN pip install --upgrade pip
+# RUN pip install --no-cache-dir -r /requirements_airflow.txt
+RUN pip install confluent_kafka
+
+# 기본 사용자로 돌아가기
+USER airflow
+
+
+
+
+
+
+
+

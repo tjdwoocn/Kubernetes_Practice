@@ -1,0 +1,13 @@
+# my-topic.yaml
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: test-topic
+  labels:
+    strimzi.io/cluster: my-cluster  # Kafka 클러스터 이름 (Kafka 설정 파일의 metadata.name과 일치해야 함)
+spec:
+  partitions: 3                      # 파티션 수 (한번 생성된 토픽의 partition 수는 변경하기 힘듦)
+  replicas: 3                        # 복제본 수
+  config:
+    retention.ms: 86400000           # 데이터 보존 기간 (밀리초 단위, 예: 하루)
+    segment.bytes: 1073741824        # 세그먼트 파일 크기 (바이트 단위, 예: 1GB)

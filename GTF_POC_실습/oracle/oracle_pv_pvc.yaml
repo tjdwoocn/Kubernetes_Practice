@@ -1,0 +1,31 @@
+# oracle-pv-pvc.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: oracle-pv
+  namespace: oracle
+spec:
+  capacity:
+    storage: 50Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: oracle-storage
+  hostPath:
+    path: /data/oracle
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: oracle-pvc
+  namespace: oracle
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+
+
+

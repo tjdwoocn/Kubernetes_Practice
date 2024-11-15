@@ -1,0 +1,22 @@
+FROM debezium/connect:latest
+
+# Oracle JDBC 드라이버 및 Debezium Oracle Connector 복사
+COPY ojdbc8.jar /kafka/connect/debezium-plugins/
+COPY ojdbc8.jar /kafka/connect/debezium-connector-oracle/
+
+
+# 환경 변수 설정
+ENV BOOTSTRAP_SERVERS=my-cluster-kafka-bootstrap.kafka.svc:9092
+ENV GROUP_ID=connect-cluster
+ENV CONFIG_STORAGE_TOPIC=connect-configs
+ENV OFFSET_STORAGE_TOPIC=connect-offsets
+ENV STATUS_STORAGE_TOPIC=connect-statuses
+ENV CONNECT_PLUGIN_PATH=/kafka/connect/debezium-plugins
+ENV CLASSPATH="/kafka/connect/debezium-plugins/ojdbc8.jar:/kafka/connect/debezium-plugins:/kafka/connect/debezium-connector-oracle/*"
+
+# 권한 설정을 위한 root 권한으로 변경
+USER root
+RUN chown -R kafka:kafka /kafka/connect/debezium-connector-oracle /kafka/connect/debezium-plugins
+
+# 작업을 마친 후 다시 kafka 사용자로 변경
+USER kafka

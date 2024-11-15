@@ -1,0 +1,10 @@
+FROM debezium/connect:latest
+
+# JDBC 드라이버 복사
+RUN rm -rf /kafka/connect/debezium-connector-oracle/
+COPY ./debezium-connector-oracle/ /kafka/connect/debezium-connector-oracle/
+COPY ./debezium-connector-oracle/ /kafka/connect/debezium-plugins/
+COPY ojdbc8.jar /kafka/connect/debezium-connector-oracle/
+COPY ojdbc8.jar /kafka/connect/debezium-plugins/
+COPY xdb-21.15.0.0.jar /kafka/connect/debezium-connector-oracle/
+COPY xdb-21.15.0.0.jar /kafka/connect/debezium-plugins/

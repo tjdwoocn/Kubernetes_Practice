@@ -1,0 +1,54 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: my-cluster-test
+spec:
+  kafka:
+    version: 3.8.0
+    replicas: 3  # 고가용성을 위해 브로커 수 증가
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: false
+      - name: external
+        port: 9094
+        type: nodeport
+        port:  30090    # 외부 접근을 위한 노드포트 추가, 30000번대의 포트로 지정됨, 직접 지정 가능
+        tls: false  # TLS 비활성화
+        # authentication:
+          # type: scram-sha-512  # 사용자 인증을 위해 SCRAM 인증 추가
+    config:
+      offsets.topic.replication.factor: 3  # 장애 복구를 위한 복제본 수 증가
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+      default.replication.factor: 3
+      min.insync.replicas: 2  # 최소 인스턴스 설정으로 데이터 손실 방지
+      inter.broker.protocol.version: "3.8"
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    storage:
+      type: jbod
+      volumes:
+      - id: 0
+        type: persistent-claim
+        size: 100Gi
+        deleteClaim: false
+  zookeeper:
+    replicas: 3  # 고가용성을 위해 복제본 수 증가
+    storage:
+      type: persistent-claim
+      size: 100Gi
+      deleteClaim: false
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}

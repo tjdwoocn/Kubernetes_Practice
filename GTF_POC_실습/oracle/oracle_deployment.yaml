@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: oracle-db
+spec:
+  serviceName: oracle
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oracle-db
+  template:
+    metadata:
+      labels:
+        app: oracle-db
+    spec:
+      containers:
+      - name: oracle-db
+        image: oracle/database:21.3.0-ee
+        ports:
+        - containerPort: 1521
+        - containerPort: 5500
+        volumeMounts:
+        - name: oracle-storage
+          mountPath: /opt/oracle/oradata
+        env:
+        - name: ORACLE_PDB
+          value: "orclpdb"
+        - name: ORACLE_PWD
+          value: "password"
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+      volumes:
+      - name: oracle-storage
+        persistentVolumeClaim:
+          claimName: oracle-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oracle-db
+spec:
+  type: ClusterIP
+  ports:
+    - port: 1521
+      targetPort: 1521
+  selector:
+    app: oracle-db
+
+

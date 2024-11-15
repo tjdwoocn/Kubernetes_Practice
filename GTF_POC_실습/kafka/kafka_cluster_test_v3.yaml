@@ -1,0 +1,48 @@
+apiVersion: kafka.strimzi.io/v1beta2   ## Strimzi Operator가 사용하는 API 버전
+kind: Kafka
+metadata:
+  name: my-cluster     ## 카프카 클러스터 이름 설정
+spec:
+  kafka:
+    version: 3.8.0     ## 설치하는 카프카 버전
+    replicas: 1        ## 카프카 브로커 수
+    listeners:
+      - name: plain    ## 일반 포트/내부 통신용/TLS 비활성화
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls      ## TLS 포트/내부 통신용/TLS 활성화
+        port: 9093
+        type: internal
+        tls: true
+    config:            ## 각종 토픽, 트랜잭션 등의 replica 설정
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      transaction.state.log.min.isr: 1
+      default.replication.factor: 1
+      min.insync.replicas: 1
+      inter.broker.protocol.version: "3.8"  ## 브로커간 프로토콜 버전
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    storage:
+      type: jbod       ## 단일 디스크
+      volumes:
+      - id: 0
+        type: persistent-claim  ## 데이터 영구 저장
+        size: 100Gi
+        deleteClaim: false
+  zookeeper:
+    replicas: 1        ## 주키퍼 replica 수
+    storage:
+      type: persistent-claim
+      size: 100Gi
+      deleteClaim: false  ## 삭제 방지
+  entityOperator:         ## Kafka 엔티티(topic/user)를 관리하는 operator 설정
+    topicOperator: {}
+    userOperator: {}
+

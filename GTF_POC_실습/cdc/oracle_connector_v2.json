@@ -1,0 +1,74 @@
+{
+    "name": "oracle-connector-debezium_v2-transformed",
+    "config": {
+        "connector.class": "io.debezium.connector.oracle.OracleConnector",
+        "tasks.max": "1",
+        "database.hostname": "oracle-db.oracle.svc.cluster.local",
+        "database.port": "1521",
+        "database.user": "C##TEST",
+        "database.password": "testpassword",
+        "database.dbname": "ORCLCDB",
+        "database.pdb.name": "ORCLPDB",
+        "database.server.name": "oracle",
+        "database.history.kafka.bootstrap.servers": "my-cluster-kafka-bootstrap.kafka.svc:9092",
+        "database.tablename.case.insensitive": "true",
+
+        "snapshot.mode": "ALWAYS",
+        "database.oracle.logmining.sleep.time.ms": "1000",
+
+        "consumer.request.timeout.ms": "60000",
+        "producer.request.timeout.ms": "60000",
+        "producer.reconnect.backoff.ms": "5000",
+        "producer.reconnect.backoff.max.ms": "10000",
+        "producer.max.block.ms": "60000",
+        "snapshot.delay.ms": "3000",
+
+        "database.connection.adapter": "logminer",
+        "producer.acks": "all",
+        "table.include.list": "C##TEST.DEBEZIUM_TEST",
+        "database.include.schema.changes": "true", 
+
+        "consumer.session.timeout.ms": "30000",
+        "database.oracle.log.mining.continuous.mine": "true",
+        "database.oracle.log.mining.archive.log.only.mode": "false",
+        "database.history.recovery.mode": "SCHEMA_ONLY_RECOVERY",
+
+        "topic.prefix": "oracle-db-changes-transformed",
+
+        "schema.history.internal.kafka.topic": "oracle.schema.history",
+        "schema.history.internal.kafka.bootstrap.servers": "my-cluster-kafka-bootstrap.kafka.svc:9092",
+
+        "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+        "key.converter.schemas.enable": "false",
+        "value.converter.schemas.enable": "false",
+        
+        "decimal.handling.mode": "string",
+
+        "transforms": "unwrap,tsconvert",
+        
+        "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+        "transforms.unwrap.drop.tombstones": "true",
+
+        "transforms.tsconvert.type": "org.apache.kafka.connect.transforms.TimestampConverter$Value",
+        "transforms.tsconvert.target.type": "string",
+        "transforms.tsconvert.format": "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX",
+        "transforms.tsconvert.field": "CREATED_AT",
+        "transforms.tsconvert.timezone": "Asia/Seoul",
+
+        "errors.tolerance": "all",
+        "errors.log.enable": true,
+        "errors.log.include.messages": true,
+
+        "poll.interval.ms": "1000",
+
+        "max.queue.size": "8192",
+        "max.batch.size": "2048",
+
+        "log.mining.strategy": "online_catalog",
+
+        "log.mining.transaction.retention.hours": "2"
+
+    }
+}
+

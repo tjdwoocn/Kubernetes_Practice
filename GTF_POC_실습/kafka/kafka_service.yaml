@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-cluster-kafka-external
+  labels:
+    strimzi.io/cluster: my-cluster
+    strimzi.io/kind: Kafka
+spec:
+  type: NodePort
+  ports:
+    - name: external
+      protocol: TCP
+      port: 9092
+      targetPort: 9092
+      nodePort: 30092
+  selector:
+    strimzi.io/name: my-cluster-kafka

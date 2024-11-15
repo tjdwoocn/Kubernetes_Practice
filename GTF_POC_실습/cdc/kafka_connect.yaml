@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-connect
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-connect
+  template:
+    metadata:
+      labels:
+        app: kafka-connect
+    spec:
+      containers:
+        - name: kafka-connect
+          # image: tjdwoocn/debezium-jdbc-image:latest
+          image: tjdwoocn/my-debezium-image_v3:latest
+          ports:
+            - containerPort: 8083
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: "my-cluster-kafka-bootstrap.kafka.svc:9092"
+            - name: GROUP_ID
+              value: "connect-cluster"
+            - name: CONFIG_STORAGE_TOPIC
+              value: "connect-configs"
+            - name: OFFSET_STORAGE_TOPIC
+              value: "connect-offsets"
+            - name: STATUS_STORAGE_TOPIC
+              value: "connect-statuses"
+            - name: CONNECT_PLUGIN_PATH
+              value: "/kafka/connect/"   # 플러그인 경로
+            - name: CLASSPATH
+              value: "/kafka/connect/"  # JDBC와 플러그인 경로 설정
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-connect-service
+  namespace: kafka
+spec:
+  selector:
+    app: kafka-connect
+  ports:
+    - protocol: TCP
+      port: 8083
+      targetPort: 8083
+

@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-consumer
+spec:
+  replicas: 3  # Consumer Pod의 개수를 3개로 설정
+  selector:
+    matchLabels:
+      app: kafka-consumer
+  template:
+    metadata:
+      labels:
+        app: kafka-consumer
+    spec:
+      containers:
+      - name: kafka-consumer
+        image: tjdwoocn/kafka-producer-consumer-test:latest
+        command: ["python", "consumer_test_v2.py"]  # Consumer 스크립트 실행
