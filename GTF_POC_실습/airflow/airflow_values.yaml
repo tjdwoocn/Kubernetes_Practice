@@ -1429,35 +1429,51 @@ webserver:
   #   CSRF_ENABLED = True
   webserverConfigConfigMapName: ~
 
+  # service:
+  #   type: ClusterIP
+  #   ## service annotations
+  #   annotations: {}
+  #   ports:
+  #     - name: airflow-ui
+  #       port: "{{ .Values.ports.airflowUI }}"
+  #   # To change the port used to access the webserver:
+  #   # ports:
+  #   #   - name: airflow-ui
+  #   #     port: 80
+  #   #     targetPort: airflow-ui
+  #   # To only expose a sidecar, not the webserver directly:
+  #   # ports:
+  #   #   - name: only_sidecar
+  #   #     port: 80
+  #   #     targetPort: 8888
+  #   # If you have a public IP, set NodePort to set an external port.
+  #   # Service type must be 'NodePort':
+  #   # ports:
+  #   #   - name: airflow-ui
+  #   #     port: 8080
+  #   #     targetPort: 8080
+  #   #     nodePort: 31151
+  #   loadBalancerIP: ~
+  #   ## Limit load balancer source ips to list of CIDRs
+  #   # loadBalancerSourceRanges:
+  #   #   - "10.123.0.0/16"
+  #   loadBalancerSourceRanges: []
+
   service:
-    type: ClusterIP
-    ## service annotations
-    annotations: {}
+    type: LoadBalancer  # 외부 접근이 가능하도록 LoadBalancer 타입으로 설정
+    annotations: {}     # 필요한 경우 여기서 LoadBalancer에 추가 설정을 할 수 있습니다
     ports:
       - name: airflow-ui
-        port: "{{ .Values.ports.airflowUI }}"
-    # To change the port used to access the webserver:
-    # ports:
-    #   - name: airflow-ui
-    #     port: 80
-    #     targetPort: airflow-ui
-    # To only expose a sidecar, not the webserver directly:
-    # ports:
-    #   - name: only_sidecar
-    #     port: 80
-    #     targetPort: 8888
-    # If you have a public IP, set NodePort to set an external port.
-    # Service type must be 'NodePort':
-    # ports:
-    #   - name: airflow-ui
-    #     port: 8080
-    #     targetPort: 8080
-    #     nodePort: 31151
-    loadBalancerIP: ~
-    ## Limit load balancer source ips to list of CIDRs
-    # loadBalancerSourceRanges:
-    #   - "10.123.0.0/16"
-    loadBalancerSourceRanges: []
+        port: 8089          # Webserver UI의 기본 포트로 설정
+        targetPort: 8089    # 컨테이너 내부의 Airflow UI 포트에 매핑
+    loadBalancerIP: ~       # GCP에서 자동으로 할당된 외부 IP를 사용합니다
+    loadBalancerSourceRanges:
+      - "0.0.0.0/0"         # 모든 IP에서 접근 허용. 보안을 위해 IP 범위를 제한하는 것도 좋습니다
+
+
+
+
+
 
   # Select certain nodes for airflow webserver pods.
   nodeSelector: {}
@@ -2365,7 +2381,7 @@ elasticsearch:
 # All ports used by chart
 ports:
   flowerUI: 5555
-  airflowUI: 8080
+  airflowUI: 8089
   workerLogs: 8793
   triggererLogs: 8794
   redisDB: 6379
@@ -2745,3 +2761,4 @@ airflow:
   podSecurityContext:
     fsGroup: 50000
     runAsUser: 50000
+
